@@ -1,4 +1,4 @@
-// FILE: csv-josh.js
+// FILE: csv-writer.js
 // PROVIDES: A class to write to CSV files
 // WRITTEN BY: Josh Kindarara
 //
