@@ -105,12 +105,10 @@ class Csv {
                 throw err;
             }
             
-            const rows = data.split('\n\n');
+            const rows = data.trim().split('\n\n');
             let rowsResult = [];
-            rows.forEach((row, i) => {
-                if (i < rows.length - 1) { // skip last element (empty string)
-                    rowsResult.push(row.split(','));
-                }
+            rows.forEach((row) => {
+                rowsResult.push(row.split(','));
             });
             
             return rowsResult;
