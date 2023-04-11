@@ -35,6 +35,7 @@
 
 const fs = require('fs');
 const path = require('path');
+//const readline = require('readline');
 
 class Csv {
     constructor(filename) {
@@ -66,6 +67,55 @@ class Csv {
             }
         });
     }
+    
+    /*
+    readrow() {
+        fs.readFile(this._filepath, 'utf8', (err, data) => {
+            if (err) {
+                throw err;
+            }
+            
+            const fileStream = fs.createReadStream(this._filepath);
+            const rl = readline.createInterface({
+                input: fileStream,
+                crlfDelay: Infinity
+            });
+
+            rl.on('line', (line) => {
+                console.log(line);
+                rl.close();
+            })
+            
+            const rows = data.split('\n\n');
+            let rowsResult = [];
+            rows.forEach((row, i) => {
+                if (i < rows.length - 1) { // skip last element (empty string)
+                    rowsResult.push(row.split(','));
+                }
+            });
+            
+            return rowsResult;
+        })
+    }
+    */
+
+    readrows() {
+        fs.readFile(this._filepath, 'utf8', (err, data) => {
+            if (err) {
+                throw err;
+            }
+            
+            const rows = data.split('\n\n');
+            let rowsResult = [];
+            rows.forEach((row, i) => {
+                if (i < rows.length - 1) { // skip last element (empty string)
+                    rowsResult.push(row.split(','));
+                }
+            });
+            
+            return rowsResult;
+        })
+    }
 
     clear() {
         //clear file
@@ -81,6 +131,7 @@ class Csv {
     }
 
     set filename(filename) {
+        // try using fs.rename()
         this._filename = `${filename}.csv`;
         this._filepath = path.join(__dirname, this._filename);
     }
@@ -89,5 +140,12 @@ class Csv {
         return this._filepath;
     }
 }
+
+const arr1 = ['ap,ple', 'banana', 'grapes', 'mango'];
+const arr2 = ['TV', 'pear', 'juice', 'john'];
+let csv = new Csv('test');
+csv.writerow(arr1);
+csv.writerow(arr2);
+csv.readrows();
 
 module.exports = Csv;
