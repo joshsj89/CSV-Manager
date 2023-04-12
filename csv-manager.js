@@ -30,8 +30,16 @@
 //
 // PUBLIC METHODS
 //  writeRow(data)
-//      Precondition: The argument must be an array.
+//      Precondition: The argument must be an array. Each element of the inner array
+//      should contain a string that represents the value in the cell.
 //      Postcondition: Each element of the array is written into a row of the CSV file.
+//
+//  writeFile(arr)
+//      Precondition: The argument must be an array of arrays. The elements of the inner
+//      arrays represent the rows of a CSV file. Each element of the inner arrays should
+//      contain a string that represents the value in the cell.
+//      Postcondition: Writes the contents of each inner array on each row with double
+//      line breaks between them.
 //
 //  parseFile()
 //      Precondition: The file must contain rows of data separated by double line breaks
@@ -73,10 +81,9 @@
 //  1.  None as of now.
 //
 // FUTURE ADDITIONS
-//  1.  A writeFile(array) method that takes an array of arrays. It could probably use writeRows().
-//  2.  A deleteRow(rowIndex) method. It could probably use parseFile(), clear(), and writeFile().
-//  3.  A getRow(rowIndex) function
-//  4.  a readRow(rowIndex) function
+//  1.  A deleteRow(rowIndex) method. It could probably use parseFile(), clear(), and writeFile().
+//  2.  A getRow(rowIndex) function
+//  3.  a readRow(rowIndex) function
 //
 
 const fs = require('fs');
@@ -107,6 +114,12 @@ class CSVManager {
         csv += data.join(',') + '\n\n';
 
         fs.appendFileSync(this._filepath, csv);
+    }
+
+    writeFile(arr) {
+        for (let i = 0; i < arr.length; i++) {
+            this.writeRow(arr[i]);
+        }
     }
 
     parseFile() {
@@ -214,9 +227,5 @@ class CSVManager {
         return this._filepath;
     }
 }
-
-let csv = new CSVManager('test');
-const temp = csv.getCell('B5');
-console.log(temp);
 
 module.exports = CSVManager;
