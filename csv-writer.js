@@ -6,13 +6,20 @@
 //  constructor(filename)
 //      Precondition: A non-empty string must be passed in.
 //      Postcondition: Appends string argument to the directory from which 
-//      the program is being run. If the file already exits, it will be
-//      cleared. If the file does not exist, a new empty one will be created.
+//      the program is being run. If the file does not exist, a new empty
+//      one will be created.
 //
 // METHODS
-//  writerow(data)
+//  writeRow(data)
 //      Precondition: The argument must be an array.
 //      Postcondition: Each element of the array is written into a row of the CSV file.
+//
+//  parseFile()
+//      Precondition: The file must contain rows of data separated by double line breaks
+//      and fields/cells separated by commas.
+//      Postcondition: Returns an array of arrays where each inner array represents a
+//      row of data in the CSV file, and each element in the inner array represents a
+//      field in the CSV row. This method does not modify the contents of the file.
 //
 //  clear()
 //      Postcondition: The CSV file is cleared.
@@ -50,7 +57,7 @@ class Csv {
         }
     }
 
-    writerow(data) {
+    writeRow(data) {
         let csv = '';
 
         data.forEach((item, i) => {
@@ -95,7 +102,7 @@ class Csv {
     }
     */
 
-    readrows() {
+    parseFile() {
         const data = fs.readFileSync(this._filepath, 'utf8');
 
         const rows = data.trim().split('\n\n');
@@ -131,14 +138,5 @@ class Csv {
         return this._filepath;
     }
 }
-
-const arr1 = ['ap,ple', 'banana', 'grapes', 'mango'];
-const arr2 = ['TV', 'pear', 'juice', 'john'];
-let csv = new Csv('test');
-csv.clear();
-csv.writerow(arr1);
-csv.writerow(arr2);
-let temp = csv.readrows();
-console.log(temp);
 
 module.exports = Csv;
