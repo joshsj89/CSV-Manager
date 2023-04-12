@@ -106,9 +106,14 @@ class Csv {
             }
             
             const rows = data.trim().split('\n\n');
+            const regex = /("[^"]*"|[^,"]+)/g;
             let rowsResult = [];
             rows.forEach((row) => {
-                rowsResult.push(row.split(','));
+                const rowResult = [];
+                row.match(regex).forEach((value) => {
+                    rowResult.push(value.trim().replace(/"/g, ''));
+                });
+                rowsResult.push(rowResult);
             });
             
             return rowsResult;
