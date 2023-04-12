@@ -73,7 +73,7 @@
 //  1.  None as of now.
 //
 // FUTURE ADDITIONS
-//  1.  Instead of returning getCell() returning 'undefined', make it return an empty string.
+//  1.  Instead of having getCell() returning 'undefined', make it return an empty string.
 //  2.  A writeFile(array) method that takes an array of arrays. It could probably use writeRows().
 //  3.  A deleteRow(rowIndex) method. It could probably use parseFile(), clear(), and writeFile().
 //  4.  A getRow(rowIndex) function
