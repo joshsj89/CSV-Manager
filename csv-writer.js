@@ -42,12 +42,12 @@ class Csv {
         this._filename = `${filename}.csv`;
         this._filepath = path.join(__dirname, this._filename);
 
-        // Creates an empty file or clears file if it's already created
-        fs.writeFile(this._filepath, '', (err) => {
-            if (err) {
-                throw err;
-            }
-        });
+        // Creates an empty file if the file doesn't exist
+        try {
+            fs.accessSync(this._filepath, fs.constants.F_OK);
+        } catch (err) {
+            fs.writeFileSync(this._filepath, '');
+        }
     }
 
     writerow(data) {
@@ -114,11 +114,7 @@ class Csv {
 
     clear() {
         //clear file
-        fs.truncate(this._filepath, 0, (err) => {
-            if (err) {
-                throw err;
-            }
-        });
+        fs.truncateSync(this._filepath, 0);
     }
 
     get filename() {
@@ -139,6 +135,7 @@ class Csv {
 const arr1 = ['ap,ple', 'banana', 'grapes', 'mango'];
 const arr2 = ['TV', 'pear', 'juice', 'john'];
 let csv = new Csv('test');
+csv.clear();
 csv.writerow(arr1);
 csv.writerow(arr2);
 let temp = csv.readrows();
