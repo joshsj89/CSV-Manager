@@ -37,7 +37,7 @@
 //      Postcondition: Returns the full path of the CSV file.
 //
 // INVARIANT
-//      1. _filename must be a string.
+//      1. _filename must be a string that ends with the extension ".csv".
 //      2. _filepath must be a string that ends with _filename.
 //
 
