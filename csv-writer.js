@@ -61,11 +61,7 @@ class Csv {
         
         csv += data.join(',') + '\n\n';
 
-        fs.appendFile(this._filepath, csv, (err) => {
-            if (err) {
-                throw err;
-            }
-        });
+        fs.appendFileSync(this._filepath, csv);
     }
     
     /*
@@ -100,24 +96,20 @@ class Csv {
     */
 
     readrows() {
-        fs.readFile(this._filepath, 'utf8', (err, data) => {
-            if (err) {
-                throw err;
-            }
-            
-            const rows = data.trim().split('\n\n');
-            const regex = /("[^"]*"|[^,"]+)/g;
-            let rowsResult = [];
-            rows.forEach((row) => {
-                const rowResult = [];
-                row.match(regex).forEach((value) => {
-                    rowResult.push(value.trim().replace(/"/g, ''));
-                });
-                rowsResult.push(rowResult);
+        const data = fs.readFileSync(this._filepath, 'utf8');
+
+        const rows = data.trim().split('\n\n');
+        const regex = /("[^"]*"|[^,"]+)/g;
+        let rowsResult = [];
+        rows.forEach((row) => {
+            const rowResult = [];
+            row.match(regex).forEach((value) => {
+                rowResult.push(value.trim().replace(/"/g, ''));
             });
-            
-            return rowsResult;
-        })
+            rowsResult.push(rowResult);
+        });
+        
+        return rowsResult;
     }
 
     clear() {
@@ -149,6 +141,7 @@ const arr2 = ['TV', 'pear', 'juice', 'john'];
 let csv = new Csv('test');
 csv.writerow(arr1);
 csv.writerow(arr2);
-csv.readrows();
+let temp = csv.readrows();
+console.log(temp);
 
 module.exports = Csv;
