@@ -10,7 +10,25 @@
 //      the program is being run. If the file does not exist, a new empty
 //      one will be created.
 //
-// METHODS
+// PRIVATE METHODS
+//  _referenceToIndices(parts)
+//      Precondition: The argument must be an array of two elements where the first element
+//      is a string that represents the column letters of a cell, and the second element is a
+//      string that represents the row number of the cell. The column letters must only contain
+//      capital letters.
+//      Postcondition: Converts column letter into a valid index for an array. Converts
+//      row number string to its respective number. It returns an array of two elements, where
+//      the first element is a number that represents the row index of the cell, and the second
+//      element is a number that represents the column index of the cell.
+//
+//  _splitCellReference(cell)
+//      Precondition: The argument must be a string that represents a valid cell reference
+//      (column letters followed by row numbers)
+//      Postcondition: Splits cell into 2 strings of letters and numbers and returns an 
+//      array holding them. The first element represents the column letters, and the second
+//      element represents the row number. The column letters will be capitalized.
+//
+// PUBLIC METHODS
 //  writeRow(data)
 //      Precondition: The argument must be an array.
 //      Postcondition: Each element of the array is written into a row of the CSV file.
@@ -21,6 +39,12 @@
 //      Postcondition: Returns an array of arrays where each inner array represents a
 //      row of data in the CSV file, and each element in the inner array represents a
 //      field in the CSV row. This method does not modify the contents of the file.
+//
+//  getCell(cell)
+//      Precondition: The argument must be a string that represents a valid cell reference
+//      (column letters followed by row numbers)
+//      Postcondition: The value in the cell that is specified by the cell argument is
+//      returned if it exists. If it doesn't exist, 'undefined' is returned.
 //
 //  clear()
 //      Postcondition: The CSV file is cleared.
@@ -45,10 +69,16 @@
 //      1. _filename must be a string that ends with the extension ".csv".
 //      2. _filepath must be a string that ends with _filename.
 //
+// CURRENT ISSUES / KNOWN BUGS
+//  1.  If the CSV file was written in a Windows text editor, parseFile() won't detect
+//      multiple rows because Windows makes a double line break '\r\n\r\n' while for 
+//      Linux and macOS, '\n\n' is a double line break. || A possible fix is changing
+//      to single line breaks and just splitting at '\n' which should work on all
+//      platforms. 
+//
 
 const fs = require('fs');
 const path = require('path');
-//const readline = require('readline');
 
 class CSVManager {
     constructor(filename) {
@@ -76,37 +106,6 @@ class CSVManager {
 
         fs.appendFileSync(this._filepath, csv);
     }
-    
-    /*
-    readrow() {
-        fs.readFile(this._filepath, 'utf8', (err, data) => {
-            if (err) {
-                throw err;
-            }
-            
-            const fileStream = fs.createReadStream(this._filepath);
-            const rl = readline.createInterface({
-                input: fileStream,
-                crlfDelay: Infinity
-            });
-
-            rl.on('line', (line) => {
-                console.log(line);
-                rl.close();
-            })
-            
-            const rows = data.split('\n\n');
-            let rowsResult = [];
-            rows.forEach((row, i) => {
-                if (i < rows.length - 1) { // skip last element (empty string)
-                    rowsResult.push(row.split(','));
-                }
-            });
-            
-            return rowsResult;
-        })
-    }
-    */
 
     parseFile() {
         const data = fs.readFileSync(this._filepath, 'utf8');
@@ -123,6 +122,47 @@ class CSVManager {
         });
         
         return rowsResult;
+    }
+
+    _referenceToIndices(parts) {
+        const rowIndex = Number(parts[1]) - 1;
+        let colIndex = 0;
+
+        for (let i = 0; i < parts[0].length; i++) {
+            colIndex *= 26;
+            colIndex += parts[0].charCodeAt(i) - 64; // 64 is 'A'.charCodeAt(0) - 1
+        }
+
+        colIndex--;
+        return [rowIndex,colIndex];
+    }
+
+    _splitCellReference(cell) {
+        const regex = /(([A-Z]|[a-z])+[1-9]\d*)/;
+        const regex2 = /(([A-Z]|[a-z])+)/;
+        
+        const matches = cell.match(regex);
+        if (matches && matches['index'] === 0) {
+            const splits = cell.split(regex2);
+            const parts = [splits[1].toUpperCase(), splits[3]];
+            return parts;
+        } else {
+            throw Error('The cell reference passed into getCell() is not valid.');
+        }
+    }
+
+    getCell(cell) {
+
+        const cvsArray = this.parseFile();
+
+        //algorithm to split 'cell' into letters and number then
+        //converts the letters into an index
+        const parts = this._splitCellReference(cell);
+        
+        //convert splits[1]/parts[0] to row number
+        const indices = this._referenceToIndices(parts);
+
+        return cvsArray[indices[0]][indices[1]];
     }
 
     clear() {
