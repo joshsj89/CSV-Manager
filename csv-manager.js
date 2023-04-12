@@ -1,5 +1,6 @@
 // FILE: csv-manager.js
 // PROVIDES: A class to write to CSV files
+// CLASS: CSVManager
 // WRITTEN BY: Josh Kindarara
 //
 // CONSTRUCTOR
@@ -36,7 +37,7 @@
 //      Postcondition: Returns the full path of the CSV file.
 //
 // INVARIANT
-//      1. _filename must be a string that ends with the extension ".csv".
+//      1. _filename must be a string.
 //      2. _filepath must be a string that ends with _filename.
 //
 
@@ -44,7 +45,7 @@ const fs = require('fs');
 const path = require('path');
 //const readline = require('readline');
 
-class Csv {
+class CSVManager {
     constructor(filename) {
         this._filename = `${filename}.csv`;
         this._filepath = path.join(__dirname, this._filename);
@@ -139,4 +140,4 @@ class Csv {
     }
 }
 
-module.exports = Csv;
+module.exports = CSVManager;
