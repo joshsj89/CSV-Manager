@@ -124,6 +124,34 @@ class CSVManager {
         fs.truncateSync(this._filepath, 0);
     }
 
+    rename(filename) {
+        filename = `${filename}.csv`;
+        const filepath = path.join(__dirname, filename);
+
+        try {
+            fs.renameSync(this._filepath, filepath);
+        } catch(err) {
+            switch (err.code) {
+                case 'ENOENT':
+                    console.error('File not found.');
+                    break;
+                case 'EACCES':
+                    console.error('The user does not have permission to modify the file.');
+                    break;
+                case 'EBUSY':
+                    console.error('The file is being used by another program.');
+                    break;
+                default:
+                    console.error('Error: ', err);
+            }
+
+            return;
+        }
+
+        this._filename = filename;
+        this._filepath = filepath;
+    }
+
     get filename() {
         return this._filename;
     }
