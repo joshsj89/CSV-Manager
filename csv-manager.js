@@ -121,7 +121,6 @@ class CSVManager {
     }
 
     clear() {
-        //clear file
         fs.truncateSync(this._filepath, 0);
     }
 
