@@ -44,7 +44,7 @@
 //      Precondition: The argument must be a string that represents a valid cell reference
 //      (column letters followed by row numbers)
 //      Postcondition: The value in the cell that is specified by the cell argument is
-//      returned if it exists. If it doesn't exist, 'undefined' is returned.
+//      returned if it exists. If it doesn't exist, an empty string is returned.
 //
 //  clear()
 //      Postcondition: The CSV file is cleared.
@@ -73,11 +73,10 @@
 //  1.  None as of now.
 //
 // FUTURE ADDITIONS
-//  1.  Instead of having getCell() returning 'undefined', make it return an empty string.
-//  2.  A writeFile(array) method that takes an array of arrays. It could probably use writeRows().
-//  3.  A deleteRow(rowIndex) method. It could probably use parseFile(), clear(), and writeFile().
-//  4.  A getRow(rowIndex) function
-//  5.  a readRow(rowIndex) function
+//  1.  A writeFile(array) method that takes an array of arrays. It could probably use writeRows().
+//  2.  A deleteRow(rowIndex) method. It could probably use parseFile(), clear(), and writeFile().
+//  3.  A getRow(rowIndex) function
+//  4.  a readRow(rowIndex) function
 //
 
 const fs = require('fs');
@@ -158,12 +157,14 @@ class CSVManager {
 
         const cvsArray = this.parseFile();
 
-        //algorithm to split 'cell' into letters and number then
-        //converts the letters into an index
         const parts = this._splitCellReference(cell);
-        
-        //convert splits[1]/parts[0] to row number
         const indices = this._referenceToIndices(parts);
+
+        if (!cvsArray[indices[0]]) {
+            return '';
+        } else if (!cvsArray[indices[0]][indices[1]]) {
+            return '';
+        }
 
         return cvsArray[indices[0]][indices[1]];
     }
@@ -213,5 +214,9 @@ class CSVManager {
         return this._filepath;
     }
 }
+
+let csv = new CSVManager('test');
+const temp = csv.getCell('B5');
+console.log(temp);
 
 module.exports = CSVManager;
