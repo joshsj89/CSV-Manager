@@ -70,11 +70,7 @@
 //      2. _filepath must be a string that ends with _filename.
 //
 // CURRENT ISSUES / KNOWN BUGS
-//  1.  If the CSV file was written in a Windows text editor, parseFile() won't detect
-//      multiple rows because Windows makes a double line break '\r\n\r\n' while for 
-//      Linux and macOS, '\n\n' is a double line break. || A possible fix is changing
-//      to single line breaks and just splitting at '\n' which should work on all
-//      platforms. 
+//  1.  None as of now.
 //
 
 const fs = require('fs');
@@ -110,7 +106,7 @@ class CSVManager {
     parseFile() {
         const data = fs.readFileSync(this._filepath, 'utf8');
 
-        const rows = data.trim().split('\n\n');
+        const rows = data.trim().split('\r\n\r\n');
         const regex = /("[^"]*"|[^,"]+)/g;
         let rowsResult = [];
         rows.forEach((row) => {
