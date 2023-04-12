@@ -5,7 +5,7 @@
 //
 // CONSTRUCTOR
 //  constructor(filename)
-//      Precondition: A non-empty string must be passed in.
+//      Precondition: A string must be passed in.
 //      Postcondition: Appends string argument to the directory from which 
 //      the program is being run. If the file does not exist, a new empty
 //      one will be created.
@@ -25,11 +25,16 @@
 //  clear()
 //      Postcondition: The CSV file is cleared.
 //
+//  rename(filename)
+//      Precondition: A string must be passed in.
+//      Postcondition: The CSV file is renamed to the new filename. If no errors occur,
+//      _filename and _filepath will be updated to reflect the filename and path.
+//
 //  filename()
 //      Postcondition: Returns the name of the CSV file with the extension.
 //
 //  filename(filename)
-//      Precondition: A non-empty string must be passed in.
+//      Precondition: A string must be passed in.
 //      Postcondition: Sets the name of the CSV file to string passed in and changes
 //      the _filepath to point to the new location.
 //
@@ -157,7 +162,6 @@ class CSVManager {
     }
 
     set filename(filename) {
-        // try using fs.rename()
         this._filename = `${filename}.csv`;
         this._filepath = path.join(__dirname, this._filename);
     }
