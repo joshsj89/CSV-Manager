@@ -34,12 +34,19 @@
 //      should contain a string that represents the value in the cell.
 //      Postcondition: Each element of the array is written into a row of the CSV file.
 //
+//  writeRows(arr)
+//      Precondition: The argument must be an array of arrays. The elements of the inner
+//      arrays represent the rows of a CSV file. Each element of the inner arrays should
+//      contain a string that represents the value in the cell.
+//      Postcondition: Appends the contents of each inner array on each row with double
+//      line breaks between them.
+//
 //  writeFile(arr)
 //      Precondition: The argument must be an array of arrays. The elements of the inner
 //      arrays represent the rows of a CSV file. Each element of the inner arrays should
 //      contain a string that represents the value in the cell.
-//      Postcondition: Writes the contents of each inner array on each row with double
-//      line breaks between them.
+//      Postcondition: Clears file and writes the contents of each inner array on each row 
+//      with double line breaks between them.
 //
 //  parseFile()
 //      Precondition: The file must contain rows of data separated by double line breaks
@@ -56,6 +63,14 @@
 //
 //  clear()
 //      Postcondition: The CSV file is cleared.
+//
+//  deleteRow(rowNum)
+//      Precondition:
+//      Postcondition:
+//
+//  deleteRowAndShift(rowNum)
+//      Precondition:
+//      Postcondition:
 //
 //  rename(filename)
 //      Precondition: A string must be passed in.
@@ -78,12 +93,15 @@
 //      2. _filepath must be a string that ends with _filename.
 //
 // CURRENT ISSUES / KNOWN BUGS
-//  1.  None as of now.
+//  1.  If the CSV file was written in a Windows text editor, parseFile() won't detect
+//      multiple rows because Windows makes a double line break '\r\n\r\n' while for 
+//      Linux and macOS, '\n\n' is a double line break. || A possible fix is changing
+//      to single line breaks and just splitting at '\n' which should work on all
+//      platforms. 
 //
 // FUTURE ADDITIONS
-//  1.  A deleteRow(rowIndex) method. It could probably use parseFile(), clear(), and writeFile().
-//  2.  A getRow(rowIndex) function
-//  3.  a readRow(rowIndex) function
+//  1.  A getRow(rowIndex) function
+//  2.  a readRow(rowIndex) function
 //
 
 const fs = require('fs');
@@ -104,35 +122,45 @@ class CSVManager {
 
     writeRow(data) {
         let csv = '';
-
-        data.forEach((item, i) => {
-            if (item.includes(',')) {
-                data[i] = `"${item}"`;
-            }
-        });
         
-        csv += data.join(',') + '\n\n';
+        if (data) {
+            data.forEach((item, i) => {
+                if (item.includes(',')) {
+                    data[i] = `"${item}"`;
+                }
+            }); 
+            csv += data.join(',') + '\n\n';
+        } else {
+            csv += '\n\n';
+        }
 
         fs.appendFileSync(this._filepath, csv);
     }
 
-    writeFile(arr) {
+    writeRows(arr) {
         for (let i = 0; i < arr.length; i++) {
             this.writeRow(arr[i]);
         }
     }
 
+    writeFile(arr) {
+        this.clear();
+        this.writeRows(arr);
+    }
+
     parseFile() {
         const data = fs.readFileSync(this._filepath, 'utf8');
 
-        const rows = data.trim().split('\r\n\r\n');
+        const rows = data.trim().split('\n\n');
         const regex = /("[^"]*"|[^,"]+)/g;
         let rowsResult = [];
         rows.forEach((row) => {
             const rowResult = [];
-            row.match(regex).forEach((value) => {
-                rowResult.push(value.trim().replace(/"/g, ''));
-            });
+            if (row) {
+                row.match(regex).forEach((value) => {
+                    rowResult.push(value.trim().replace(/"/g, ''));
+                });
+            }
             rowsResult.push(rowResult);
         });
         
@@ -212,6 +240,31 @@ class CSVManager {
 
         this._filename = filename;
         this._filepath = filepath;
+    }
+    
+    deleteRow(rowNum) {
+        let cvsArray = this.parseFile();
+        const index = Number(rowNum) - 1;
+        if (index < 0 || index === NaN) {
+            throw Error('The row number must be a positive integer.');
+        }
+        cvsArray[index] = []
+        this.writeFile(cvsArray);
+    }
+
+    deleteRowAndShift(rowNum) {
+        let cvsArray = this.parseFile();
+        const index = Number(rowNum) - 1;
+        if (index < 0 || index === NaN) {
+            throw Error('The row number must be a positive integer.');
+        }
+        cvsArray[index] = []
+        this.clear();
+        for (let i = index; i < cvsArray.length - 1; i++) {
+            cvsArray[i] = cvsArray[i+1];
+        }
+        cvsArray[cvsArray.length - 1] = [];
+        this.writeFile(cvsArray);
     }
 
     get filename() {
