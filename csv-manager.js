@@ -97,6 +97,13 @@
 //  filepath()
 //      Postcondition: Returns the full path of the CSV file.
 //
+// OPERATIONS
+//  copy(obj)
+//      Precondition: An instance of the CSVManager must be passed in as the argument.
+//      Postcondition: Copies the file pointed to by obj's filepath to the file pointed
+//      to by the instance calling the function. The file pointed to by the current
+//      instance of the object will be overwritten.
+//
 // INVARIANT
 //      1. _filename must be a string that ends with the extension ".csv".
 //      2. _filepath must be a string that ends with _filename.
@@ -110,7 +117,6 @@
 //
 // FUTURE ADDITIONS
 //  1.  A non-member function to compare two CSVManager objects
-//  2.  A non-member function that serves as an assignment operator for two CSVManager objects
 //
 
 const fs = require('fs');
@@ -296,6 +302,14 @@ class CSVManager {
 
     get filepath() {
         return this._filepath;
+    }
+
+    copy(obj) {
+        if (obj instanceof CSVManager) {
+            throw Error('The object passed into .copy() must be of type CSVManager');
+        }
+
+        fs.copyFileSync(obj.filepath, this._filepath);
     }
 }
 
