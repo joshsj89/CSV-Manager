@@ -105,6 +105,8 @@
 // FUTURE ADDITIONS
 //  1.  A getRow(rowIndex) function
 //  2.  a readRow(rowIndex) function
+//  3.  A non-member function to compare two CSVManager objects
+//  4.  A non-member function that serves as an assignment operator for two CSVManager objects
 //
 
 const fs = require('fs');
