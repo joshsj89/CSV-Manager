@@ -65,12 +65,15 @@
 //      Postcondition: The CSV file is cleared.
 //
 //  deleteRow(rowNum)
-//      Precondition:
-//      Postcondition:
+//      Precondition: The argument must be a positive integer. It can be passed as a string
+//      or number.
+//      Postcondition: The row to which rowNum refers to will be removed from the CSV file.
 //
 //  deleteRowAndShift(rowNum)
-//      Precondition:
-//      Postcondition:
+//      Precondition: The argument must be a positive integer. It can be passed as a string
+//      or number.
+//      Postcondition: The row to which rowNum refers to will be removed from the CSV file.
+//      All rows below the deleted row will be shifted up.
 //
 //  rename(filename)
 //      Precondition: A string must be passed in.
@@ -196,18 +199,18 @@ class CSVManager {
 
     getCell(cell) {
 
-        const cvsArray = this.parseFile();
+        const csvArray = this.parseFile();
 
         const parts = this._splitCellReference(cell);
         const indices = this._referenceToIndices(parts);
 
-        if (!cvsArray[indices[0]]) {
+        if (!csvArray[indices[0]]) {
             return '';
-        } else if (!cvsArray[indices[0]][indices[1]]) {
+        } else if (!csvArray[indices[0]][indices[1]]) {
             return '';
         }
 
-        return cvsArray[indices[0]][indices[1]];
+        return csvArray[indices[0]][indices[1]];
     }
 
     clear() {
@@ -243,28 +246,28 @@ class CSVManager {
     }
     
     deleteRow(rowNum) {
-        let cvsArray = this.parseFile();
+        let csvArray = this.parseFile();
         const index = Number(rowNum) - 1;
         if (index < 0 || index === NaN) {
             throw Error('The row number must be a positive integer.');
         }
-        cvsArray[index] = []
-        this.writeFile(cvsArray);
+        csvArray[index] = []
+        this.writeFile(csvArray);
     }
 
     deleteRowAndShift(rowNum) {
-        let cvsArray = this.parseFile();
+        let csvArray = this.parseFile();
         const index = Number(rowNum) - 1;
         if (index < 0 || index === NaN) {
             throw Error('The row number must be a positive integer.');
         }
-        cvsArray[index] = []
+        csvArray[index] = []
         this.clear();
-        for (let i = index; i < cvsArray.length - 1; i++) {
-            cvsArray[i] = cvsArray[i+1];
+        for (let i = index; i < csvArray.length - 1; i++) {
+            csvArray[i] = csvArray[i+1];
         }
-        cvsArray[cvsArray.length - 1] = [];
-        this.writeFile(cvsArray);
+        csvArray[csvArray.length - 1] = [];
+        this.writeFile(csvArray);
     }
 
     get filename() {
