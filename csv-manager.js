@@ -61,6 +61,12 @@
 //      Postcondition: The value in the cell that is specified by the cell argument is
 //      returned if it exists. If it doesn't exist, an empty string is returned.
 //
+//  getRow(rowNum)
+//      Precondition: The argument must be a positive integer. It can be passed as a string
+//      or number. 
+//      Postcondition: Returns the row to which rowNum refers to as an array. If the index
+//      is out of range, an empty array is returned. 
+//
 //  clear()
 //      Postcondition: The CSV file is cleared.
 //
@@ -103,10 +109,8 @@
 //      platforms. 
 //
 // FUTURE ADDITIONS
-//  1.  A getRow(rowIndex) function
-//  2.  a readRow(rowIndex) function
-//  3.  A non-member function to compare two CSVManager objects
-//  4.  A non-member function that serves as an assignment operator for two CSVManager objects
+//  1.  A non-member function to compare two CSVManager objects
+//  2.  A non-member function that serves as an assignment operator for two CSVManager objects
 //
 
 const fs = require('fs');
@@ -200,7 +204,6 @@ class CSVManager {
     }
 
     getCell(cell) {
-
         const csvArray = this.parseFile();
 
         const parts = this._splitCellReference(cell);
@@ -213,6 +216,16 @@ class CSVManager {
         }
 
         return csvArray[indices[0]][indices[1]];
+    }
+
+    getRow(rowNum) {
+        const csvArray = this.parseFile();
+        const index = Number(rowNum) - 1;
+        if (index < 0 || index === NaN) {
+            throw Error('The row number must be a positive integer.');
+        }
+
+        return csvArray[index] ? csvArray[index]: [];
     }
 
     clear() {
