@@ -1,4 +1,3 @@
-"use strict";
 // FILE: csv-manager.js
 // PROVIDES: A class to write to CSV files
 // CLASS: CSVManager
@@ -119,114 +118,160 @@
 // FUTURE ADDITIONS
 //  1.  A non-member function to compare two CSVManager objects
 //
+
 const fs = require('fs');
 const path = require('path');
+
+interface CSVManagerType {
+    _filename: string;
+    _filepath: string;
+
+    constructor(filename: string): void;
+
+    writeRow(data: string[]): void;
+    writeRows(arr: string[][]): void;
+    writeFile(arr: string[][]): void;
+    parseFile(): string[][];
+    _referenceToIndices(parts: string[]): number[];
+    _splitCellReference(cell: string): string[];
+    getCell(cell: string): string;
+    getRow(rowNum: string): string[];
+    clear(): void;
+    rename(filename: string): void;
+    deleteRow(rowNum: string): void;
+    deleteRowAndShift(rowNum: string): void;
+
+    filename: string;
+    filepath: string;
+    copy(obj: CSVManagerType): void;
+}
+
 class CSVManager {
-    constructor(filename) {
+    private _filename: string;
+    private _filepath: string;
+    
+    constructor(filename: string) {
         this._filename = `${filename}.csv`;
         this._filepath = path.join(__dirname, this._filename);
+
         // Creates an empty file if the file doesn't exist
         try {
             fs.accessSync(this._filepath, fs.constants.F_OK);
-        }
-        catch (err) {
+        } catch (err) {
             fs.writeFileSync(this._filepath, '');
         }
     }
-    writeRow(data) {
+
+    writeRow(data: string[]) {
         let csv = '';
+        
         if (data) {
             data.forEach((item, i) => {
                 if (item.includes(',')) {
                     data[i] = `"${item}"`;
                 }
-            });
+            }); 
             csv += data.join(',') + '\n\n';
-        }
-        else {
+        } else {
             csv += '\n\n';
         }
+
         fs.appendFileSync(this._filepath, csv);
     }
-    writeRows(arr) {
+
+    writeRows(arr: string[][]) {
         for (let i = 0; i < arr.length; i++) {
             this.writeRow(arr[i]);
         }
     }
-    writeFile(arr) {
+
+    writeFile(arr: string[][]) {
         this.clear();
         this.writeRows(arr);
     }
-    parseFile() {
-        const data = fs.readFileSync(this._filepath, 'utf8');
+
+    parseFile(): string[][] {
+        const data: string = fs.readFileSync(this._filepath, 'utf8');
+
         const rows = data.trim().split('\n\n');
         const regex = /("[^"]*"|[^,"]+)/g;
-        const rowsResult = [];
+        const rowsResult: string[][] = [];
         rows.forEach((row) => {
-            var _a;
-            const rowResult = [];
+            const rowResult: string[] = [];
             if (row) {
-                (_a = row === null || row === void 0 ? void 0 : row.match(regex)) === null || _a === void 0 ? void 0 : _a.forEach((value) => {
+                row?.match(regex)?.forEach((value) => {
                     rowResult.push(value.trim().replace(/"/g, ''));
                 });
             }
             rowsResult.push(rowResult);
         });
+        
         return rowsResult;
     }
-    _referenceToIndices(parts) {
+
+    _referenceToIndices(parts: string[]): number[] {
         const rowIndex = Number(parts[1]) - 1;
         let colIndex = 0;
+
         for (let i = 0; i < parts[0].length; i++) {
             colIndex *= 26;
             colIndex += parts[0].charCodeAt(i) - 64; // 64 is 'A'.charCodeAt(0) - 1
         }
+
         colIndex--;
-        return [rowIndex, colIndex];
+        return [rowIndex,colIndex];
     }
-    _splitCellReference(cell) {
+
+    _splitCellReference(cell: string): string[] {
         const regex = /(([A-Z]|[a-z])+[1-9]\d*)/;
         const regex2 = /(([A-Z]|[a-z])+)/;
+        
         const matches = cell.match(regex);
         if (matches && matches['index'] === 0) {
             const splits = cell.split(regex2);
             const parts = [splits[1].toUpperCase(), splits[3]];
             return parts;
-        }
-        else {
+        } else {
             throw Error('The cell reference passed into getCell() is not valid.');
         }
     }
-    getCell(cell) {
+
+    getCell(cell: string): string {
         const csvArray = this.parseFile();
+
         const parts = this._splitCellReference(cell);
         const indices = this._referenceToIndices(parts);
+
         if (!csvArray[indices[0]]) {
             return '';
-        }
-        else if (!csvArray[indices[0]][indices[1]]) {
+        } else if (!csvArray[indices[0]][indices[1]]) {
             return '';
         }
+
         return csvArray[indices[0]][indices[1]];
     }
-    getRow(rowNum) {
+
+    getRow(rowNum: string): string[] {
         const csvArray = this.parseFile();
         const index = Number(rowNum) - 1;
         if (index < 0 || Number.isNaN(index)) {
             throw Error('The row number must be a positive integer.');
         }
+
         return csvArray[index] ? csvArray[index] : [];
     }
+
     clear() {
         fs.truncateSync(this._filepath, 0);
     }
-    rename(filename) {
+
+    rename(filename: string) {
         filename = `${filename}.csv`;
         const filepath = path.join(__dirname, filename);
+
         try {
             fs.renameSync(this._filepath, filepath);
-        }
-        catch (err) {
+        } catch(err: any) {
             switch (err.code) {
                 case 'ENOENT':
                     console.error('File not found.');
@@ -240,47 +285,55 @@ class CSVManager {
                 default:
                     console.error('Error: ', err);
             }
+
             return;
         }
+
         this._filename = filename;
         this._filepath = filepath;
     }
-    deleteRow(rowNum) {
+    
+    deleteRow(rowNum: string) {
         let csvArray = this.parseFile();
         const index = Number(rowNum) - 1;
         if (index < 0 || Number.isNaN(index)) {
             throw Error('The row number must be a positive integer.');
         }
-        csvArray[index] = [];
+        csvArray[index] = []
         this.writeFile(csvArray);
     }
-    deleteRowAndShift(rowNum) {
+
+    deleteRowAndShift(rowNum: string) {
         let csvArray = this.parseFile();
         const index = Number(rowNum) - 1;
         if (index < 0 || Number.isNaN(index)) {
             throw Error('The row number must be a positive integer.');
         }
-        csvArray[index] = [];
+        csvArray[index] = []
         this.clear();
         for (let i = index; i < csvArray.length - 1; i++) {
-            csvArray[i] = csvArray[i + 1];
+            csvArray[i] = csvArray[i+1];
         }
         csvArray[csvArray.length - 1] = [];
         this.writeFile(csvArray);
     }
-    get filename() {
+
+    get filename(): string {
         return this._filename;
     }
+
     set filename(filename) {
         this._filename = `${filename}.csv`;
         this._filepath = path.join(__dirname, this._filename);
     }
-    get filepath() {
+
+    get filepath(): string {
         return this._filepath;
     }
-    copy(obj) {
+
+    copy(obj: CSVManager) {
         fs.copyFileSync(obj.filepath, this._filepath);
     }
 }
+
 module.exports = CSVManager;
-//# sourceMappingURL=csv-manager.js.map
