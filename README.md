@@ -116,6 +116,15 @@ An instance of the CSVManager must be passed in as the argument.
 ### Postcondition:
 Copies the file pointed to by obj's filepath to the file pointed to by the instance calling the function. The file pointed to by the current instance of the object will be overwritten.
 
+# NON-MEMBER FUNCTIONS
+
+## compare(obj1, obj2)
+### Precondition:
+Two instances of CSVManager must be passed in as arguments.
+
+### Postcondition:
+Returns true if the contents of the two CSV files are the same.
+
 # INVARIANT
 
 1. _filename must be a string that ends with the extension ".csv".
@@ -124,7 +133,3 @@ Copies the file pointed to by obj's filepath to the file pointed to by the insta
 # CURRENT ISSUES / KNOWN BUGS
 
 1. If the CSV file was written in a Windows text editor, parseFile() won't detect multiple rows because Windows makes a double line break '\r\n\r\n' while for Linux and macOS, '\n\n' is a double line break. A possible fix is changing to single line breaks and just splitting at '\n' which should work on all platforms.
-
-# FUTURE ADDITIONS
-
-1. A non-member function to compare two CSVManager objects.

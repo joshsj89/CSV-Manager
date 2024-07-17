@@ -104,6 +104,11 @@
 //      to by the instance calling the function. The file pointed to by the current
 //      instance of the object will be overwritten.
 //
+// NON-MEMBER FUNCTIONS
+//  compare(obj1, obj2)
+//      Precondition: Two instances of CSVManager must be passed in as arguments.
+//      Postcondition: Returns true if the contents of the two CSV files are the same.
+//
 // INVARIANT
 //      1. _filename must be a string that ends with the extension ".csv".
 //      2. _filepath must be a string that ends with _filename.
@@ -113,10 +118,7 @@
 //      multiple rows because Windows makes a double line break '\r\n\r\n' while for 
 //      Linux and macOS, '\n\n' is a double line break. || A possible fix is changing
 //      to single line breaks and just splitting at '\n' which should work on all
-//      platforms. 
-//
-// FUTURE ADDITIONS
-//  1.  A non-member function to compare two CSVManager objects
+//      platforms.
 //
 
 const fs = require('fs');
@@ -334,6 +336,29 @@ class CSVManager {
     copy(obj: CSVManager) {
         fs.copyFileSync(obj.filepath, this._filepath);
     }
+}
+
+const compare = (obj1: CSVManager, obj2: CSVManager): boolean => {
+    const file1 = obj1.parseFile();
+    const file2 = obj2.parseFile();
+
+    if (file1.length !== file2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < file1.length; i++) {
+        if (file1[i].length !== file2[i].length) {
+            return false;
+        }
+
+        for (let j = 0; j < file1[i].length; j++) {
+            if (file1[i][j] !== file2[i][j]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 module.exports = CSVManager;
